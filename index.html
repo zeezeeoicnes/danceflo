@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Dance Flo - Graffiti Mix</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Outfit:wght@900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Outfit:wght@400;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --fnf-pink: #ff00ff;
@@ -20,7 +20,7 @@
         body {
             margin: 0;
             overflow: hidden;
-            background-color: #080808;
+            background-color: #050505;
             font-family: 'Outfit', sans-serif;
             color: white;
             user-select: none;
@@ -37,109 +37,156 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            overflow: hidden;
         }
-        .ui-layer > * { pointer-events: auto; }
 
-        .screen { display: none; width: 100%; height: 100%; position: relative; }
-        .screen.active { display: flex; flex-direction: column; }
+        /* Screen Transitions */
+        .screen { 
+            display: none; 
+            width: 100%; 
+            height: 100%; 
+            position: absolute; 
+            inset: 0;
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out;
+            pointer-events: none;
+        }
+
+        .screen.active { 
+            display: flex; 
+            opacity: 1; 
+            pointer-events: auto;
+            z-index: 10;
+        }
+
+        /* Staggered Button/Element Entrance */
+        .screen.active .stagger-item {
+            animation: staggerIn 0.5s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+            opacity: 0;
+        }
+
+        @keyframes staggerIn {
+            from { opacity: 0; transform: translateY(30px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Countdown Style */
+        #countdown-container {
+            position: absolute;
+            inset: 0;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .count-text {
+            font-family: 'Permanent Marker', cursive;
+            font-size: 15rem;
+            color: white;
+            text-shadow: 10px 10px 0 var(--fnf-pink);
+            animation: countPop 0.8s ease-out forwards;
+        }
+
+        @keyframes countPop {
+            0% { transform: scale(0.5); opacity: 0; }
+            20% { transform: scale(1.2); opacity: 1; }
+            80% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
 
         .logo-bop {
-            animation: logo-bop 0.4s infinite alternate cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: logo-bop 0.6s infinite alternate cubic-bezier(0.175, 0.885, 0.32, 1.275);
             font-family: 'Permanent Marker', cursive;
-            filter: drop-shadow(0 0 15px var(--fnf-pink));
+            filter: drop-shadow(0 0 20px var(--fnf-pink));
         }
         @keyframes logo-bop {
-            from { transform: scale(1) rotate(-3deg); }
-            to { transform: scale(1.15) rotate(3deg); }
+            from { transform: scale(1) rotate(-2deg); }
+            to { transform: scale(1.08) rotate(2deg); }
         }
 
         .street-menu-btn {
             font-family: 'Permanent Marker', cursive;
-            font-size: 5rem;
+            font-size: 4.5rem;
             cursor: pointer;
-            text-shadow: 8px 8px 0px #000;
+            text-shadow: 6px 6px 0px #000;
             transition: all 0.2s;
             position: relative;
-            padding: 0 40px;
+            padding: 10px 40px;
             color: white;
             border: none;
             background: none;
+            text-align: left;
+            pointer-events: auto;
         }
         .street-menu-btn:hover {
-            transform: scale(1.1) translateX(15px) rotate(-1deg);
+            transform: scale(1.1) translateX(20px) rotate(-2deg);
             color: var(--fnf-cyan);
-            text-shadow: 10px 10px 0px var(--fnf-pink);
+            text-shadow: 8px 8px 0px var(--fnf-pink);
         }
 
         .osu-container {
             display: flex; width: 100%; height: 100%;
-            background: linear-gradient(90deg, rgba(0,0,0,0.9) 0%, transparent 100%);
+            background: linear-gradient(90deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 100%);
         }
-        .song-preview-side { width: 40%; display: flex; flex-direction: column; justify-content: center; padding: 60px; }
-        .song-list-side { width: 60%; overflow-y: auto; padding: 120px 40px; scrollbar-width: none; }
+        .song-preview-side { width: 45%; display: flex; flex-direction: column; justify-content: center; padding: 60px; }
+        .song-list-side { width: 55%; overflow-y: auto; padding: 100px 40px; scrollbar-width: none; }
         
         .osu-card {
-            background: rgba(30,30,30,0.9);
-            margin-bottom: 20px;
-            padding: 25px 50px;
-            border-right: 20px solid transparent;
+            background: rgba(20,20,20,0.8);
+            margin-bottom: 24px;
+            padding: 30px 60px;
+            border-right: 15px solid transparent;
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform: perspective(1000px) rotateY(-10deg);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: perspective(1000px) rotateY(-15deg);
             display: flex; flex-direction: column;
             align-items: flex-end;
             text-align: right;
-            border: 2px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.05);
+            pointer-events: auto;
         }
         .osu-card.active {
             background: #fff; color: #000;
             border-right: 20px solid var(--fnf-pink);
-            transform: perspective(1000px) rotateY(-20deg) scale(1.1) translateX(-40px);
-            box-shadow: 0 0 50px rgba(255,0,255,0.3);
+            transform: perspective(1000px) rotateY(-25deg) scale(1.05) translateX(-30px);
+            box-shadow: -20px 20px 40px rgba(255,0,255,0.2);
         }
 
-        .highway { position: absolute; top: 0; left: 50%; transform: translateX(-50%); height: 100%; display: flex; gap: 25px; }
-        .lane { width: 110px; height: 100%; position: relative; background: rgba(255,255,255,0.03); pointer-events: auto; }
+        .highway { position: absolute; top: 0; left: 50%; transform: translateX(-50%); height: 100%; display: flex; gap: 20px; width: 500px; padding: 0 10px; background: rgba(255,255,255,0.02); }
+        .lane { flex: 1; height: 100%; position: relative; border-left: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05); }
         
         .receptor {
-            position: absolute; bottom: 80px; width: 100px; height: 100px;
-            border: 6px solid rgba(255,255,255,0.2); border-radius: 15px;
+            position: absolute; bottom: 100px; width: 100px; height: 100px;
+            border: 4px solid rgba(255,255,255,0.15); border-radius: 20px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 60px; left: 5px; transition: transform 0.05s;
-            pointer-events: none;
+            font-size: 55px; left: 50%; transform: translateX(-50%); transition: transform 0.05s, background 0.1s;
+            pointer-events: none; z-index: 20;
         }
-        .receptor.hit { transform: scale(0.8); border-color: #fff; background: rgba(255,255,255,0.3); }
-
-        .note { 
-            position: absolute; width: 100px; height: 100px; border-radius: 15px;
-            display: flex; align-items: center; justify-content: center; font-size: 60px;
-            left: 5px; box-shadow: 0 10px 0px rgba(0,0,0,0.4); font-weight: bold;
-            pointer-events: none; z-index: 50;
-        }
+        .receptor.hit { transform: translateX(-50%) scale(0.85); background: rgba(255,255,255,0.2); border-color: #fff; }
 
         .judgement {
-            position: absolute; top: 25%; left: 50%; transform: translate(-50%, -50%);
-            font-family: 'Permanent Marker', cursive; font-size: 8rem; pointer-events: none; opacity: 0;
-            text-shadow: 10px 10px 0px #000; -webkit-text-stroke: 3px white;
+            position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%);
+            font-family: 'Permanent Marker', cursive; font-size: 7rem; pointer-events: none; opacity: 0;
+            text-shadow: 8px 8px 0px #000; -webkit-text-stroke: 2px white; z-index: 100;
         }
-        .animate-judgement { animation: graffiti-bounce 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.5) forwards; }
+        .animate-judgement { animation: graffiti-bounce 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.5) forwards; }
         @keyframes graffiti-bounce {
-            0% { opacity: 0; transform: translate(-50%, -20%) scale(0.2) rotate(-20deg); }
-            40% { opacity: 1; transform: translate(-50%, -50%) scale(1.2) rotate(10deg); }
-            100% { opacity: 0; transform: translate(-50%, -80%) scale(1) rotate(0deg); }
+            0% { opacity: 0; transform: translate(-50%, -10%) scale(0.4) rotate(-15deg); }
+            40% { opacity: 1; transform: translate(-50%, -50%) scale(1.1) rotate(5deg); }
+            100% { opacity: 0; transform: translate(-50%, -70%) scale(1) rotate(0deg); }
         }
 
-        .pause-overlay {
-            position: absolute; inset: 0; background: rgba(0,0,0,0.8);
-            z-index: 100; display: none; flex-direction: column; justify-content: center; align-items: center;
-            backdrop-filter: blur(8px);
+        .stat-hud {
+            position: absolute; top: 40px; right: 40px;
+            display: flex; flex-direction: column; align-items: flex-end;
+            text-align: right; pointer-events: none;
+            gap: 10px;
         }
-
-        .rank-badge {
-            font-family: 'Permanent Marker', cursive; font-size: 15rem; line-height: 1;
-            text-shadow: 15px 15px 0px var(--fnf-pink);
-            animation: rank-appear 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
+        .stat-group { display: flex; flex-direction: column; align-items: flex-end; }
+        .stat-label { font-size: 0.8rem; font-weight: 900; opacity: 0.4; text-transform: uppercase; letter-spacing: 0.2em; }
+        .stat-value { font-family: 'Outfit', sans-serif; font-weight: 900; font-style: italic; line-height: 1; }
 
         #loading-overlay {
             position: fixed; inset: 0; background: black; z-index: 1000; display: none;
@@ -147,27 +194,33 @@
         }
     </style>
 </head>
-<body class="bg-black">
+<body>
 
     <div id="loading-overlay">
-        <div class="font-['Permanent_Marker'] text-6xl text-white animate-pulse">LOADING STREETS...</div>
+        <div class="font-['Permanent_Marker'] text-6xl text-white animate-pulse italic">TAGGING THE WALLS...</div>
+    </div>
+
+    <div id="countdown-container">
+        <div id="countdown-text" class="count-text">3</div>
     </div>
 
     <canvas id="bg-canvas"></canvas>
 
     <div class="ui-layer">
         <!-- Title Screen -->
-        <div id="screen-title" class="screen active justify-center items-center cursor-pointer" onclick="app.initAudioAndStart()">
-            <div class="logo-bop text-[15rem] leading-none mb-10 text-pink-500 text-center" style="text-shadow: 15px 15px 0 #fff">DANCE<br>FLO</div>
-            <div class="font-['Permanent_Marker'] text-5xl text-white">CLICK TO START</div>
+        <div id="screen-title" class="screen active flex-col justify-center items-center cursor-pointer" onclick="app.initAudioAndStart()">
+            <div class="stagger-item logo-bop text-[12rem] leading-[0.9] mb-8 text-pink-500 text-center" style="text-shadow: 10px 10px 0 #fff">DANCE<br>FLO</div>
+            <div class="stagger-item font-['Permanent_Marker'] text-4xl text-white tracking-widest animate-pulse" style="animation-delay: 0.1s">CLICK TO START</div>
+            <div class="stagger-item absolute bottom-10 text-white/30 font-bold uppercase tracking-tighter" style="animation-delay: 0.2s">Graffiti Mix v2.0</div>
         </div>
 
         <!-- Main Menu -->
-        <div id="screen-main" class="screen items-start justify-center pl-24">
-            <div class="flex flex-col items-start space-y-2">
-                <button class="street-menu-btn" onclick="app.showScreen('screen-select')">PLAY</button>
-                <button class="street-menu-btn" onclick="app.showScreen('screen-main')">SETTINGS</button>
-                <button class="street-menu-btn" onclick="window.location.reload()">EXIT</button>
+        <div id="screen-main" class="screen flex-col items-start justify-center pl-32">
+            <div class="flex flex-col items-start space-y-4">
+                <button class="stagger-item street-menu-btn" onclick="app.showScreen('screen-select')" style="animation-delay: 0.05s">PLAY</button>
+                <button class="stagger-item street-menu-btn opacity-40 cursor-not-allowed" style="animation-delay: 0.1s">COLLECTION</button>
+                <button class="stagger-item street-menu-btn opacity-40 cursor-not-allowed" style="animation-delay: 0.15s">MODS</button>
+                <button class="stagger-item street-menu-btn" onclick="window.location.reload()" style="animation-delay: 0.2s">EXIT</button>
             </div>
         </div>
 
@@ -175,13 +228,15 @@
         <div id="screen-select" class="screen">
             <div class="osu-container">
                 <div class="song-preview-side">
-                    <div id="preview-art" class="w-full aspect-square bg-white/5 rounded-3xl mb-8 flex items-center justify-center overflow-hidden border-8 border-white transform rotate-[-2deg]">
-                        <div class="text-[12rem] opacity-30">🔥</div>
+                    <div id="preview-art" class="stagger-item w-full aspect-square bg-white/5 rounded-[40px] mb-8 flex items-center justify-center overflow-hidden border-[12px] border-white transform rotate-[-3deg] transition-all duration-500">
+                        <div class="text-[14rem] opacity-40 filter grayscale">🎵</div>
                     </div>
-                    <h2 id="preview-title" class="text-7xl font-black italic uppercase leading-none mb-2" style="text-shadow: 5px 5px 0 var(--fnf-pink)">SONG TITLE</h2>
-                    <p id="preview-artist" class="text-3xl text-cyan-400 mb-10 font-bold tracking-tighter">ARTIST NAME</p>
-                    <button id="btn-start-game" class="bg-white text-black hover:bg-pink-500 hover:text-white p-8 text-5xl font-black skew-x-[-12deg] transition-all transform hover:scale-110" onclick="app.startGame()">LETS GO!</button>
-                    <button class="mt-8 text-white/40 text-2xl font-bold hover:text-white transition-colors" onclick="app.showScreen('screen-main')">BACK</button>
+                    <h2 id="preview-title" class="stagger-item text-6xl font-black italic uppercase leading-none mb-3" style="text-shadow: 4px 4px 0 var(--fnf-pink); animation-delay: 0.1s">SONG TITLE</h2>
+                    <p id="preview-artist" class="stagger-item text-2xl text-cyan-400 mb-12 font-bold tracking-tight uppercase" style="animation-delay: 0.15s">ARTIST NAME</p>
+                    <div class="stagger-item flex space-x-4" style="animation-delay: 0.2s">
+                        <button id="btn-start-game" class="flex-1 bg-white text-black hover:bg-pink-500 hover:text-white py-6 text-4xl font-black skew-x-[-10deg] transition-all transform hover:scale-105 active:scale-95 shadow-xl" onclick="app.startGame()">LETS GO!</button>
+                        <button class="bg-black/40 hover:bg-white/10 text-white px-8 text-xl font-bold rounded-xl transition-all" onclick="app.showScreen('screen-main')">BACK</button>
+                    </div>
                 </div>
                 <div class="song-list-side" id="song-list"></div>
             </div>
@@ -191,17 +246,19 @@
         <div id="screen-game" class="screen">
             <div id="judgement" class="judgement">PERFECT</div>
             
-            <button class="absolute top-10 right-10 z-[60] bg-white/10 hover:bg-white/20 p-4 rounded-xl backdrop-blur-md border border-white/20 transition-all pointer-events-auto" onclick="app.togglePause()">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="white"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
-            </button>
-
-            <div class="absolute top-10 left-10 text-white">
-                <div class="text-2xl font-bold opacity-50 uppercase">Accuracy</div>
-                <div id="game-acc-val" class="text-6xl font-black italic">100.0%</div>
-            </div>
-            <div class="absolute bottom-10 right-10 text-white text-right">
-                <div class="text-2xl font-bold opacity-50 uppercase">Score</div>
-                <div id="score-val" class="text-6xl font-black italic text-cyan-400">0</div>
+            <div class="stat-hud">
+                <div class="stat-group">
+                    <span class="stat-label">Score</span>
+                    <span id="score-val" class="stat-value text-7xl text-white">0</span>
+                </div>
+                <div class="stat-group">
+                    <span class="stat-label">Accuracy</span>
+                    <span id="game-acc-val" class="stat-value text-4xl text-[var(--fnf-cyan)]">100.0%</span>
+                </div>
+                <div class="stat-group">
+                    <span class="stat-label">Combo</span>
+                    <span id="combo-val" class="stat-value text-5xl text-[var(--fnf-pink)] transition-opacity opacity-0">0</span>
+                </div>
             </div>
 
             <div class="highway">
@@ -218,39 +275,33 @@
                     <div class="receptor" id="receptor-3" style="color:var(--note-right)">→</div>
                 </div>
             </div>
-
-            <div id="pause-menu" class="pause-overlay">
-                <h2 class="font-['Permanent_Marker'] text-9xl text-white mb-12" style="text-shadow: 10px 10px 0 var(--fnf-pink)">PAUSED</h2>
-                <div class="flex flex-col space-y-4">
-                    <button class="street-menu-btn" onclick="app.togglePause()">CONTINUE</button>
-                    <button class="street-menu-btn" onclick="app.startGame()">RESTART</button>
-                    <button class="street-menu-btn text-3xl" onclick="app.quitGame()">QUIT</button>
-                </div>
-            </div>
         </div>
 
         <!-- Results Screen -->
-        <div id="screen-results" class="screen bg-black/95 p-20 flex-row items-center justify-between">
+        <div id="screen-results" class="screen bg-black/98 p-24 flex-row items-center justify-between">
             <div class="w-1/2 flex flex-col items-start">
-                <h1 class="font-['Permanent_Marker'] text-9xl text-white mb-8" style="text-shadow: 10px 10px 0 var(--fnf-pink)">FINISH!</h1>
-                <div class="space-y-4 w-full max-w-lg">
-                    <div class="flex justify-between items-center bg-white/5 p-6 border-l-8 border-[var(--fnf-cyan)]"><span class="text-4xl font-black">PERFECT</span><span id="res-perfect" class="text-6xl font-black text-[var(--fnf-cyan)]">0</span></div>
-                    <div class="flex justify-between items-center bg-white/5 p-6 border-l-8 border-[var(--fnf-yellow)]"><span class="text-4xl font-black">GOOD</span><span id="res-good" class="text-6xl font-black text-[var(--fnf-yellow)]">0</span></div>
-                    <div class="flex justify-between items-center bg-white/5 p-6 border-l-8 border-orange-500"><span class="text-4xl font-black">BAD</span><span id="res-bad" class="text-6xl font-black text-orange-500">0</span></div>
-                    <div class="flex justify-between items-center bg-white/5 p-6 border-l-8 border-gray-600"><span class="text-4xl font-black text-gray-500">MISS</span><span id="res-miss" class="text-6xl font-black text-gray-500">0</span></div>
+                <h1 class="stagger-item font-['Permanent_Marker'] text-[9rem] leading-none text-white mb-10" style="text-shadow: 12px 12px 0 var(--fnf-pink)">FINISH!</h1>
+                <div class="grid grid-cols-2 gap-4 w-full max-w-xl">
+                    <div class="stagger-item bg-white/5 p-6 border-l-[10px] border-[var(--fnf-cyan)] flex flex-col" style="animation-delay: 0.1s">
+                        <span class="text-xl font-bold opacity-40">PERFECT</span>
+                        <span id="res-perfect" class="text-6xl font-black text-[var(--fnf-cyan)]">0</span>
+                    </div>
+                    <div class="stagger-item bg-white/5 p-6 border-l-[10px] border-[var(--fnf-yellow)] flex flex-col" style="animation-delay: 0.15s">
+                        <span class="text-xl font-bold opacity-40">GOOD</span>
+                        <span id="res-good" class="text-6xl font-black text-[var(--fnf-yellow)]">0</span>
+                    </div>
                 </div>
-                <div class="mt-12 flex space-x-12 items-end">
-                    <div><div class="text-2xl font-bold text-white/40 uppercase">Score</div><div id="res-score" class="text-8xl font-black italic">0</div></div>
-                    <div><div class="text-2xl font-bold text-white/40 uppercase">Accuracy</div><div id="res-acc" class="text-8xl font-black text-[var(--fnf-pink)] italic">0%</div></div>
+                <div class="stagger-item flex space-x-16 items-end mt-14" style="animation-delay: 0.3s">
+                    <div><div class="text-xl font-bold text-white/30 uppercase tracking-widest">Score</div><div id="res-score" class="text-8xl font-black italic">0</div></div>
+                    <div><div class="text-xl font-bold text-white/30 uppercase tracking-widest">Accuracy</div><div id="res-acc" class="text-8xl font-black text-[var(--fnf-pink)] italic">0%</div></div>
                 </div>
-                <div class="flex space-x-8 mt-16">
-                    <button class="street-menu-btn text-4xl" onclick="app.startGame()">REPLAY</button>
-                    <button class="street-menu-btn text-4xl" onclick="app.showScreen('screen-select')">MENU</button>
+                <div class="stagger-item flex space-x-8 mt-20" style="animation-delay: 0.4s">
+                    <button class="street-menu-btn text-5xl" onclick="app.startGame()">REPLAY</button>
+                    <button class="street-menu-btn text-5xl" onclick="app.showScreen('screen-select')">EXIT</button>
                 </div>
             </div>
             <div class="w-1/2 flex flex-col items-center justify-center">
-                <div id="res-rank" class="rank-badge">S</div>
-                <div id="res-msg" class="text-3xl font-bold italic text-white/60 text-center mt-10">LEGENDARY PERFORMANCE</div>
+                <div id="res-rank" class="stagger-item rank-badge" style="animation-delay: 0.5s">S</div>
             </div>
         </div>
     </div>
@@ -261,7 +312,6 @@
                 title: "TEACH ME DOUGIE", 
                 artist: "BOUDHA CREW REMIX", 
                 bpm: 85, 
-                color: "#ff00ff",
                 url: "https://dl.dropboxusercontent.com/scl/fi/wub4nwe9v57udxwf7dojc/Teach-Me-How-to-Dougie-Steelies-Of-Boudha-Crew-Dance-Cover-Choreography-by-MannexManhattan.mp3?rlkey=spzt7op2ctq2f5ct2u7gy2h35"
             }
         ];
@@ -269,34 +319,39 @@
         class Game {
             constructor() {
                 this.canvas = document.getElementById('bg-canvas');
-                this.ctx = this.canvas.getContext('2d');
+                this.ctx = this.canvas.getContext('2d', { alpha: false });
                 this.selectedIndex = 0;
                 this.isPlaying = false;
-                this.isPaused = false;
+                this.isCountingDown = false;
                 this.score = 0;
+                this.combo = 0;
                 this.stats = { perfect: 0, good: 0, bad: 0, miss: 0 };
                 this.notes = [];
                 this.startTime = 0;
-                this.pauseTime = 0;
                 this.audioCtx = null;
                 this.analyser = null;
                 this.dataArray = null;
                 this.currentAudio = null;
-                this.source = null;
                 this.userActivated = false;
+                this.currentScreenId = 'screen-title';
 
-                this.initBase();
+                this.init();
             }
 
-            initBase() {
+            init() {
                 this.resize();
                 window.addEventListener('resize', () => this.resize());
                 this.renderSongs();
                 
-                const keyMap = { 'ArrowLeft': 0, 'ArrowDown': 1, 'ArrowUp': 2, 'ArrowRight': 3, 'Escape': 'pause' };
+                const keyMap = { 
+                    'ArrowLeft': 0, 'a': 0, 'A': 0,
+                    'ArrowDown': 1, 's': 1, 'S': 1,
+                    'ArrowUp': 2, 'w': 2, 'W': 2,
+                    'ArrowRight': 3, 'd': 3, 'D': 3
+                };
+
                 window.addEventListener('keydown', (e) => {
-                    if (keyMap[e.key] === 'pause') { if (this.isPlaying) this.togglePause(); return; }
-                    if (this.isPlaying && !this.isPaused && keyMap[e.key] !== undefined && !e.repeat) {
+                    if (this.isPlaying && keyMap[e.key] !== undefined && !e.repeat) {
                         e.preventDefault(); this.handleInput(keyMap[e.key]);
                     }
                 });
@@ -314,36 +369,45 @@
 
             async initAudioAndStart() {
                 if (this.userActivated) return;
-                
-                try {
-                    this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                    if (this.audioCtx.state === 'suspended') await this.audioCtx.resume();
-                    
-                    this.analyser = this.audioCtx.createAnalyser();
-                    this.analyser.fftSize = 128;
-                    this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
-                    
-                    this.userActivated = true;
-                    this.showScreen('screen-main');
-                } catch (e) {
-                    console.error("Audio Context initialization failed", e);
-                }
+                this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (this.audioCtx.state === 'suspended') await this.audioCtx.resume();
+                this.analyser = this.audioCtx.createAnalyser();
+                this.analyser.fftSize = 128;
+                this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
+                this.userActivated = true;
+                this.showScreen('screen-main');
             }
 
             showScreen(id) {
-                this.isPaused = false;
-                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-                const target = document.getElementById(id);
-                if (target) target.classList.add('active');
+                const oldScreen = document.getElementById(this.currentScreenId);
+                const newScreen = document.getElementById(id);
+
+                if (oldScreen) oldScreen.classList.remove('active');
+                
+                // Delay showing items to restart stagger animation
+                if (newScreen) {
+                    newScreen.style.display = 'flex';
+                    // Strip and re-add stagger items to re-trigger animations
+                    const items = newScreen.querySelectorAll('.stagger-item');
+                    items.forEach(item => { item.style.animation = 'none'; void item.offsetWidth; item.style.animation = ''; });
+                    
+                    void newScreen.offsetWidth;
+                    newScreen.classList.add('active');
+                }
+
+                setTimeout(() => {
+                    if (oldScreen && oldScreen !== newScreen) oldScreen.style.display = 'none';
+                }, 400);
+
+                this.currentScreenId = id;
             }
 
             renderSongs() {
                 const list = document.getElementById('song-list');
-                if (!list) return;
                 list.innerHTML = SONGS.map((s, i) => `
-                    <div class="osu-card ${i === 0 ? 'active' : ''}" id="song-${i}" onclick="app.selectSong(${i})">
-                        <div class="title">${s.title}</div>
-                        <div class="artist">BY ${s.artist}</div>
+                    <div class="osu-card stagger-item ${i === 0 ? 'active' : ''}" style="animation-delay: ${0.05 * i}s" onclick="app.selectSong(${i})">
+                        <div class="title text-[2.2rem] font-black uppercase leading-none">${s.title}</div>
+                        <div class="artist text-sm font-bold opacity-60">BY ${s.artist}</div>
                     </div>
                 `).join('');
                 this.updatePreview();
@@ -353,252 +417,6 @@
                 this.selectedIndex = i;
                 document.querySelectorAll('.osu-card').forEach((c, idx) => c.classList.toggle('active', idx === i));
                 this.updatePreview();
-                this.playSfx(150, 'sine');
             }
 
-            updatePreview() {
-                const s = SONGS[this.selectedIndex];
-                const title = document.getElementById('preview-title');
-                const artist = document.getElementById('preview-artist');
-                const art = document.getElementById('preview-art');
-                if (title) title.innerText = s.title;
-                if (artist) artist.innerText = s.artist;
-                if (art) art.style.borderColor = s.color;
-            }
-
-            playSfx(freq, type = 'square') {
-                if(!this.audioCtx || this.isPaused) return;
-                const osc = this.audioCtx.createOscillator();
-                const g = this.audioCtx.createGain();
-                osc.type = type; osc.frequency.value = freq;
-                g.gain.setValueAtTime(0.05, this.audioCtx.currentTime);
-                g.gain.exponentialRampToValueAtTime(0.001, this.audioCtx.currentTime + 0.1);
-                osc.connect(g); g.connect(this.audioCtx.destination);
-                osc.start(); osc.stop(this.audioCtx.currentTime + 0.1);
-            }
-
-            togglePause() {
-                if (!this.currentAudio) return;
-                this.isPaused = !this.isPaused;
-                const menu = document.getElementById('pause-menu');
-                if (this.isPaused) {
-                    this.currentAudio.pause();
-                    this.pauseTime = performance.now();
-                    menu.style.display = 'flex';
-                } else {
-                    this.currentAudio.play();
-                    this.startTime += (performance.now() - this.pauseTime);
-                    menu.style.display = 'none';
-                    this.gameLoop();
-                }
-            }
-
-            quitGame() {
-                this.isPlaying = false;
-                if (this.currentAudio) {
-                    this.currentAudio.pause();
-                    this.currentAudio.src = "";
-                }
-                this.showScreen('screen-select');
-            }
-
-            async startGame() {
-                const song = SONGS[this.selectedIndex];
-                const overlay = document.getElementById('loading-overlay');
-                if (overlay) overlay.style.display = 'flex';
-
-                try {
-                    if (this.currentAudio) {
-                        this.currentAudio.pause();
-                        this.currentAudio.src = "";
-                        this.currentAudio = null;
-                    }
-
-                    this.currentAudio = new Audio();
-                    this.currentAudio.crossOrigin = "anonymous";
-                    
-                    await new Promise((resolve, reject) => {
-                        this.currentAudio.addEventListener('canplaythrough', resolve, { once: true });
-                        this.currentAudio.addEventListener('error', reject, { once: true });
-                        this.currentAudio.src = song.url;
-                        this.currentAudio.load();
-                        setTimeout(resolve, 10000); 
-                    });
-
-                    if (this.audioCtx && !this.source) {
-                        this.source = this.audioCtx.createMediaElementSource(this.currentAudio);
-                        this.source.connect(this.analyser);
-                        this.analyser.connect(this.audioCtx.destination);
-                    }
-
-                    if (overlay) overlay.style.display = 'none';
-
-                    this.isPlaying = true;
-                    this.isPaused = false;
-                    this.score = 0; 
-                    this.stats = { perfect: 0, good: 0, bad: 0, miss: 0 };
-                    this.notes = [];
-                    document.getElementById('pause-menu').style.display = 'none';
-
-                    this.showScreen('screen-game');
-                    this.updateUI();
-
-                    const beatGap = (60 / song.bpm) * 1000;
-                    for(let i = 0; i < 500; i++) {
-                        this.notes.push({
-                            lane: Math.floor(Math.random() * 4),
-                            time: 3000 + (i * beatGap), 
-                            hit: false, missed: false, el: null
-                        });
-                    }
-
-                    this.startTime = performance.now();
-                    this.currentAudio.play();
-                    this.gameLoop();
-
-                } catch (e) {
-                    console.error("Audio play failed", e);
-                    if (overlay) overlay.style.display = 'none';
-                }
-            }
-
-            handleInput(lane) {
-                if (!this.isPlaying || this.isPaused) return;
-                const r = document.getElementById(`receptor-${lane}`);
-                if (r) r.classList.add('hit');
-                
-                const now = performance.now() - this.startTime;
-                const note = this.notes.find(n => !n.hit && !n.missed && n.lane === lane && Math.abs(n.time - now) < 200);
-
-                if (note) {
-                    const diff = Math.abs(note.time - now);
-                    let judge, color;
-                    if (diff < 70) { judge = "PERFECT"; color = "var(--fnf-cyan)"; this.stats.perfect++; this.score += 500; }
-                    else if (diff < 140) { judge = "GOOD"; color = "var(--fnf-yellow)"; this.stats.good++; this.score += 250; }
-                    else { judge = "BAD"; color = "#ff4444"; this.stats.bad++; this.score += 50; }
-
-                    note.hit = true;
-                    if (note.el) { note.el.remove(); note.el = null; }
-                    this.showJudgement(judge, color);
-                    this.playSfx(300 + (lane * 50));
-                }
-                this.updateUI();
-            }
-
-            releaseInput(lane) {
-                const r = document.getElementById(`receptor-${lane}`);
-                if (r) r.classList.remove('hit');
-            }
-
-            showJudgement(txt, color) {
-                const j = document.getElementById('judgement');
-                if (!j) return;
-                j.innerText = txt;
-                j.style.color = color;
-                j.classList.remove('animate-judgement');
-                void j.offsetWidth;
-                j.classList.add('animate-judgement');
-            }
-
-            getAccuracy() {
-                const total = this.stats.perfect + this.stats.good + this.stats.bad + this.stats.miss;
-                if (total === 0) return 100.0;
-                return (((this.stats.perfect * 1) + (this.stats.good * 0.7) + (this.stats.bad * 0.3)) / total) * 100;
-            }
-
-            updateUI() {
-                const scoreVal = document.getElementById('score-val');
-                const accVal = document.getElementById('game-acc-val');
-                if (scoreVal) scoreVal.innerText = this.score;
-                if (accVal) accVal.innerText = this.getAccuracy().toFixed(1) + "%";
-            }
-
-            bgLoop() {
-                this.ctx.fillStyle = 'rgba(8, 8, 8, 0.2)';
-                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-                
-                if(this.analyser && !this.isPaused) {
-                    this.analyser.getByteFrequencyData(this.dataArray);
-                    const color = SONGS[this.selectedIndex]?.color || '#ff00ff';
-                    this.ctx.strokeStyle = color;
-                    this.ctx.lineWidth = 4;
-                    this.ctx.beginPath();
-                    const slice = this.canvas.width / this.dataArray.length;
-                    let x = 0;
-                    for(let i=0; i<this.dataArray.length; i++) {
-                        const h = (this.dataArray[i] / 255) * 400;
-                        const y = this.canvas.height - h;
-                        if(i === 0) this.ctx.moveTo(x, y); else this.ctx.lineTo(x, y);
-                        x += slice;
-                    }
-                    this.ctx.stroke();
-                }
-                requestAnimationFrame(() => this.bgLoop());
-            }
-
-            gameLoop() {
-                if(!this.isPlaying || this.isPaused) return;
-                const now = performance.now() - this.startTime;
-                const receptorY = this.canvas.height - 180;
-                const speed = 0.85;
-
-                this.notes.forEach(n => {
-                    if(n.hit || n.missed) return;
-                    const rel = n.time - now;
-                    const y = receptorY - (rel * speed);
-
-                    if(!n.el && y > -150 && y < this.canvas.height) {
-                        n.el = document.createElement('div');
-                        n.el.className = 'note';
-                        n.el.innerText = ['←', '↓', '↑', '→'][n.lane];
-                        n.el.style.backgroundColor = ['var(--note-left)', 'var(--note-down)', 'var(--note-up)', 'var(--note-right)'][n.lane];
-                        document.getElementById(`lane-${n.lane}`).appendChild(n.el);
-                    }
-                    if(n.el) n.el.style.top = y + 'px';
-
-                    if(rel < -180) {
-                        n.missed = true;
-                        this.stats.miss++;
-                        if(n.el) { n.el.remove(); n.el = null; }
-                        this.showJudgement("MISS", "#555555");
-                        this.updateUI();
-                    }
-                });
-
-                if (this.currentAudio && this.currentAudio.ended) {
-                    this.endGame();
-                } else {
-                    requestAnimationFrame(() => this.gameLoop());
-                }
-            }
-
-            endGame() {
-                if (!this.isPlaying) return;
-                this.isPlaying = false;
-                this.showResults();
-            }
-
-            showResults() {
-                document.getElementById('res-perfect').innerText = this.stats.perfect;
-                document.getElementById('res-good').innerText = this.stats.good;
-                document.getElementById('res-bad').innerText = this.stats.bad;
-                document.getElementById('res-miss').innerText = this.stats.miss;
-                document.getElementById('res-score').innerText = this.score;
-                const acc = this.getAccuracy();
-                document.getElementById('res-acc').innerText = acc.toFixed(1) + "%";
-
-                let rank = "F", msg = "TRY AGAIN!";
-                if (acc > 98) { rank = "S"; msg = "ABSOLUTE LEGEND!"; }
-                else if (acc > 90) { rank = "A"; msg = "STREET MASTER!"; }
-                else if (acc > 75) { rank = "B"; msg = "DOING GREAT!"; }
-                else if (acc > 50) { rank = "C"; msg = "STREET DANCER"; }
-                document.getElementById('res-rank').innerText = rank;
-                document.getElementById('res-msg').innerText = msg;
-                this.showScreen('screen-results');
-            }
-        }
-
-        const app = new Game();
-    </script>
-</body>
-</html>
+      
