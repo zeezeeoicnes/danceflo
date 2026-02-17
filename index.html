@@ -419,4 +419,189 @@
                 this.updatePreview();
             }
 
-      
+            updatePreview() {
+                const s = SONGS[this.selectedIndex];
+                document.getElementById('preview-title').innerText = s.title;
+                document.getElementById('preview-artist').innerText = "BY " + s.artist;
+            }
+
+            async startGame() {
+                document.getElementById('loading-overlay').style.display = 'flex';
+                const song = SONGS[this.selectedIndex];
+                
+                try {
+                    if (this.currentAudio) this.currentAudio.pause();
+                    this.currentAudio = new Audio(song.url);
+                    this.currentAudio.crossOrigin = "anonymous";
+                    
+                    const source = this.audioCtx.createMediaElementSource(this.currentAudio);
+                    source.connect(this.analyser);
+                    this.analyser.connect(this.audioCtx.destination);
+
+                    await new Promise(resolve => { this.currentAudio.oncanplaythrough = resolve; });
+
+                    this.resetStats();
+                    this.notes = this.generateNotes(song.bpm, 180);
+                    this.isPlaying = false;
+                    this.isCountingDown = true;
+                    
+                    document.getElementById('loading-overlay').style.display = 'none';
+                    this.showScreen('screen-game');
+                    this.runCountdown();
+
+                } catch (e) {
+                    console.error(e);
+                    document.getElementById('loading-overlay').style.display = 'none';
+                }
+            }
+
+            runCountdown() {
+                const container = document.getElementById('countdown-container');
+                const text = document.getElementById('countdown-text');
+                const sequence = ['3', '2', '1', 'GO!'];
+                container.style.display = 'flex';
+
+                let step = 0;
+                const nextStep = () => {
+                    if (step >= sequence.length) {
+                        container.style.display = 'none';
+                        this.isCountingDown = false;
+                        this.isPlaying = true;
+                        this.currentAudio.play();
+                        this.startTime = Date.now();
+                        return;
+                    }
+                    text.innerText = sequence[step];
+                    text.style.animation = 'none';
+                    void text.offsetWidth;
+                    text.style.animation = 'countPop 0.8s ease-out forwards';
+                    step++;
+                    setTimeout(nextStep, 800);
+                };
+                nextStep();
+            }
+
+            generateNotes(bpm, durationSec) {
+                const notes = [];
+                const interval = 60000 / bpm;
+                for (let t = 2000; t < durationSec * 1000; t += interval) {
+                    if (Math.random() > 0.3) notes.push({ time: t, lane: Math.floor(Math.random() * 4), hit: false });
+                    if (Math.random() > 0.85) notes.push({ time: t + interval/2, lane: Math.floor(Math.random() * 4), hit: false });
+                }
+                return notes;
+            }
+
+            resetStats() {
+                this.score = 0;
+                this.combo = 0;
+                this.stats = { perfect: 0, good: 0, bad: 0, miss: 0 };
+                this.updateUI();
+            }
+
+            updateUI() {
+                document.getElementById('score-val').innerText = this.score;
+                const total = this.stats.perfect + this.stats.good + this.stats.bad + this.stats.miss;
+                const acc = total === 0 ? 100 : ((this.stats.perfect * 100 + this.stats.good * 70 + this.stats.bad * 30) / total).toFixed(1);
+                document.getElementById('game-acc-val').innerText = acc + "%";
+                const c = document.getElementById('combo-val');
+                c.innerText = this.combo;
+                c.style.opacity = this.combo > 0 ? "1" : "0";
+            }
+
+            handleInput(lane) {
+                document.getElementById(`receptor-${lane}`).classList.add('hit');
+                if (!this.isPlaying) return;
+                const now = Date.now() - this.startTime;
+                let best = null, min = 150;
+                for (const n of this.notes) {
+                    if (n.lane === lane && !n.hit) {
+                        const d = Math.abs(n.time - now);
+                        if (d < min) { min = d; best = n; }
+                    }
+                }
+                if (best) { best.hit = true; this.processHit(min); }
+            }
+
+            releaseInput(lane) {
+                document.getElementById(`receptor-${lane}`).classList.remove('hit');
+            }
+
+            processHit(diff) {
+                let r = 'MISS';
+                if (diff < 45) { r = 'PERFECT'; this.score += 100; this.stats.perfect++; this.combo++; }
+                else if (diff < 90) { r = 'GOOD'; this.score += 70; this.stats.good++; this.combo++; }
+                else if (diff < 150) { r = 'BAD'; this.score += 30; this.stats.bad++; this.combo = 0; }
+                this.showJudgement(r);
+                this.updateUI();
+            }
+
+            showJudgement(t) {
+                const j = document.getElementById('judgement');
+                j.innerText = t;
+                j.style.color = t === 'PERFECT' ? 'var(--fnf-cyan)' : t === 'GOOD' ? 'var(--fnf-yellow)' : '#ff4444';
+                j.classList.remove('animate-judgement');
+                void j.offsetWidth;
+                j.classList.add('animate-judgement');
+            }
+
+            bgLoop() {
+                const draw = () => {
+                    const { width, height } = this.canvas;
+                    this.ctx.fillStyle = '#050505';
+                    this.ctx.fillRect(0, 0, width, height);
+
+                    if (this.analyser && this.userActivated) {
+                        this.analyser.getByteFrequencyData(this.dataArray);
+                        const bW = width / this.dataArray.length;
+                        for (let i = 0; i < this.dataArray.length; i++) {
+                            const h = (this.dataArray[i] / 255) * height * 0.4;
+                            this.ctx.fillStyle = `hsla(${(i/64)*360}, 100%, 50%, 0.1)`;
+                            this.ctx.fillRect(i*bW, height-h, bW-2, h);
+                            this.ctx.fillRect(i*bW, 0, bW-2, h);
+                        }
+                    }
+
+                    if (this.isPlaying) {
+                        const now = Date.now() - this.startTime;
+                        const lW = 125, hL = (width - 500) / 2, rY = height - 150, speed = 1.2;
+                        this.notes.forEach(n => {
+                            if (n.hit) return;
+                            const y = rY - (n.time - now) * speed;
+                            if (y > height) { n.hit = true; this.combo = 0; this.stats.miss++; this.showJudgement('MISS'); this.updateUI(); }
+                            else if (y > -100) {
+                                this.ctx.fillStyle = this.getNoteColor(n.lane);
+                                this.ctx.beginPath();
+                                this.ctx.roundRect(hL + n.lane * lW + 12, y, 100, 100, 20);
+                                this.ctx.fill();
+                                this.ctx.fillStyle = 'white';
+                                this.ctx.font = '900 55px Outfit';
+                                this.ctx.textAlign = 'center';
+                                this.ctx.fillText(['←', '↓', '↑', '→'][n.lane], hL + n.lane * lW + 62, y + 68);
+                            }
+                        });
+                        if (this.currentAudio && this.currentAudio.ended) this.endGame();
+                    }
+                    requestAnimationFrame(draw);
+                };
+                draw();
+            }
+
+            getNoteColor(l) { return ['#c24b99', '#00ffff', '#12fa05', '#f9393f'][l]; }
+
+            endGame() {
+                this.isPlaying = false;
+                this.showScreen('screen-results');
+                document.getElementById('res-perfect').innerText = this.stats.perfect;
+                document.getElementById('res-good').innerText = this.stats.good;
+                document.getElementById('res-score').innerText = this.score;
+                const total = this.stats.perfect + this.stats.good + this.stats.bad + this.stats.miss;
+                const acc = total === 0 ? 0 : ((this.stats.perfect * 100 + this.stats.good * 70 + this.stats.bad * 30) / total).toFixed(1);
+                document.getElementById('res-acc').innerText = acc + "%";
+                document.getElementById('res-rank').innerText = acc > 95 ? 'S' : acc > 85 ? 'A' : 'B';
+            }
+        }
+
+        const app = new Game();
+    </script>
+</body>
+</html>
